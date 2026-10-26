@@ -1,0 +1,114 @@
+table dim_date
+	lineageTag: 25c91a19-50a5-427c-89d1-32e1747594ab
+	dataCategory: Time
+
+	column date
+		dataType: dateTime
+		isUnique
+		formatString: Long Date
+		lineageTag: d3378cf5-815b-4f10-adff-0a3b2e60b065
+		summarizeBy: none
+		sourceColumn: date
+
+		variation Variation
+			isDefault
+			relationship: 47cf861a-2e8a-4bf9-b2bd-eb1957237222
+			defaultHierarchy: LocalDateTable_1c2e2341-6723-4bc5-8e38-a2b765b62034.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a008b04-aa2f-47f4-ac4f-245a094bf152
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 86885dcd-779c-4c4e-8570-2c46813ff348
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 118a291f-0760-441e-a01f-11963b4eb297
+		summarizeBy: none
+		sourceColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: 720433a4-9ebd-494e-9d0f-98bc1ecc0515
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month
+		dataType: string
+		lineageTag: 5d687491-c610-4036-bc0a-15bc981e78e9
+		summarizeBy: none
+		sourceColumn: year_month
+		sortByColumn: year_month_sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month_sort
+		dataType: int64
+		formatString: 0
+		lineageTag: 0be65e91-7c01-4e3f-ba34-5cc9ad502960
+		summarizeBy: none
+		sourceColumn: year_month_sort
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3209bd98-cac2-4baa-ad57-17f29eeb1eeb
+		summarizeBy: none
+		sourceColumn: month_start
+
+		variation Variation
+			isDefault
+			relationship: 217333e1-5e40-441f-9bf5-0e4286eafc2f
+			defaultHierarchy: LocalDateTable_d71ed2db-7cc0-49a3-9c3b-c2db1a2ef1dc.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column is_in_reporting_window
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 484ef177-e712-4022-897f-997caf48bced
+		summarizeBy: none
+		sourceColumn: is_in_reporting_window
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'reporting dim_date' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_dim_date = Source{[Schema="reporting",Item="dim_date"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(reporting_dim_date,{{"year", Int64.Type}, {"year_month_sort", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

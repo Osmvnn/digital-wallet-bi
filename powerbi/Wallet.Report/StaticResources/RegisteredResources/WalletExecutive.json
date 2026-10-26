@@ -1,0 +1,29 @@
+{
+  "name": "WalletExecutive",
+  "dataColors": [
+    "#008B86",
+    "#3573B9",
+    "#D59A35",
+    "#B45567"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#132D46",
+  "tableAccent": "#008B86",
+  "textClasses": {
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 11,
+      "color": "#60758A"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 13,
+      "color": "#132D46"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 30,
+      "color": "#132D46"
+    }
+  }
+}

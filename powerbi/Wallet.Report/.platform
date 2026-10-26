@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Wallet"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c21d55c9-d19b-4a9d-b367-9cfd5dfb9199"
+  }
+}

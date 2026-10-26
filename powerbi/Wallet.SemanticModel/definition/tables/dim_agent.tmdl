@@ -1,0 +1,40 @@
+table dim_agent
+	lineageTag: e3485a9f-3b31-4cb0-ac7c-30d0ed8185cd
+
+	column agent_id
+		dataType: string
+		lineageTag: 91b87def-f493-44a2-be22-818b8397c4ed
+		summarizeBy: none
+		sourceColumn: agent_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: deee64b8-503a-4566-a194-396be82b2960
+		summarizeBy: none
+		sourceColumn: opened_date
+
+		variation Variation
+			isDefault
+			relationship: 9ae312b6-1ca7-4941-a75f-8271e6fed22c
+			defaultHierarchy: LocalDateTable_d7f7be71-614e-49bb-aba4-d23bef62b1f2.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'reporting dim_agent' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_dim_agent = Source{[Schema="reporting",Item="dim_agent"]}[Data]
+				in
+				    reporting_dim_agent
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

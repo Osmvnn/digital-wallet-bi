@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Wallet"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "552dd96c-c7a9-4bd5-b66a-d42717190d23"
+  }
+}

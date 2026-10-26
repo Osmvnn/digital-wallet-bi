@@ -1,0 +1,32 @@
+table dim_service
+	lineageTag: 64837ff8-4152-4534-b87b-b1f67c1ab990
+
+	column service_type
+		dataType: string
+		lineageTag: df84c6c2-2ada-4825-b096-5fb3f82d220f
+		summarizeBy: none
+		sourceColumn: service_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column service_name
+		dataType: string
+		lineageTag: fc9fd01a-84b5-4050-b26c-01a858663257
+		summarizeBy: none
+		sourceColumn: service_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'reporting dim_service' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_dim_service = Source{[Schema="reporting",Item="dim_service"]}[Data]
+				in
+				    reporting_dim_service
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

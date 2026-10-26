@@ -1,0 +1,33 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["reporting dim_service","reporting dim_merchant","reporting dim_date","reporting dim_agent","reporting fact_transaction","reporting fact_reversal"]
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table dim_service
+ref table dim_merchant
+ref table DateTableTemplate_6c527ae5-5f9e-4a54-82c8-b457a30d7281
+ref table LocalDateTable_cda5f23e-af91-49df-9502-25ef9b3e00ab
+ref table dim_date
+ref table LocalDateTable_1c2e2341-6723-4bc5-8e38-a2b765b62034
+ref table LocalDateTable_d71ed2db-7cc0-49a3-9c3b-c2db1a2ef1dc
+ref table dim_agent
+ref table LocalDateTable_d7f7be71-614e-49bb-aba4-d23bef62b1f2
+ref table fact_transaction
+ref table LocalDateTable_bd0d44cf-fd96-4fe7-ada1-993e8a61580c
+ref table LocalDateTable_e159921f-7021-4a68-9ca0-59ae2bd7f033
+ref table fact_reversal
+ref table LocalDateTable_abb7a525-f030-4daa-b327-8837c5f476c9
+ref table LocalDateTable_6f6abb20-a97d-4fd2-b590-91eeca2f7c06
+
+ref cultureInfo en-US
+

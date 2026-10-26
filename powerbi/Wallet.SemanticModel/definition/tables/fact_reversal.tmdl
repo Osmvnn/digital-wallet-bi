@@ -1,0 +1,147 @@
+table fact_reversal
+	lineageTag: ae1e4287-5a3d-44b4-8265-087e6c260511
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Reversal Count' = COUNTROWS('fact_reversal')
+		formatString: #,0
+		displayFolder: Executive overview
+		lineageTag: be71152b-231a-4669-a071-ae4139ad5022
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Reversed Value AED' = DIVIDE(SUM('fact_reversal'[amount_minor]), 100)
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: c324cc22-be09-4094-81b1-20fccaaf8920
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Fee Refunds AED' = DIVIDE(SUM('fact_reversal'[fee_refund_minor]), 100)
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: 6bc0297f-0f56-442a-932f-33cdeea837ba
+
+	column id
+		dataType: string
+		lineageTag: 63a56afd-9be9-4ac8-b8a9-984c0bcf3859
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column original_id
+		dataType: string
+		lineageTag: 4c023356-96b2-4891-9462-5d7cd4eb3738
+		summarizeBy: none
+		sourceColumn: original_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column occurred_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 07c1d618-a309-406c-b103-4e01a7d67e34
+		summarizeBy: none
+		sourceColumn: occurred_at
+
+		variation Variation
+			isDefault
+			relationship: d8fd9974-455c-48b7-8127-f2eefd1658d6
+			defaultHierarchy: LocalDateTable_abb7a525-f030-4daa-b327-8837c5f476c9.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency
+		dataType: string
+		lineageTag: 9f4ee13b-1ad1-4a5a-9053-48d16e87677e
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount_minor
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d50c7ab-4d26-4e97-8a6e-34d73e4b018c
+		summarizeBy: sum
+		sourceColumn: amount_minor
+
+		annotation SummarizationSetBy = Automatic
+
+	column fee_refund_minor
+		dataType: int64
+		formatString: 0
+		lineageTag: 8acb1758-e72f-43a9-8fdc-6a27eaca6f7c
+		summarizeBy: sum
+		sourceColumn: fee_refund_minor
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a57599e8-96a9-4838-91ff-58280f7cca77
+		summarizeBy: none
+		sourceColumn: event_date
+
+		variation Variation
+			isDefault
+			relationship: ed8cfc6f-bfe8-492e-8dce-014e588f4147
+			defaultHierarchy: LocalDateTable_6f6abb20-a97d-4fd2-b590-91eeca2f7c06.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column type
+		dataType: string
+		lineageTag: 0438d245-d7a2-4200-809e-748bfc21d0f5
+		summarizeBy: none
+		sourceColumn: type
+
+		annotation SummarizationSetBy = Automatic
+
+	column sender_id
+		dataType: string
+		lineageTag: 22d7c73d-7738-4a66-988b-76d0f0d26800
+		summarizeBy: none
+		sourceColumn: sender_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column recipient_id
+		dataType: string
+		lineageTag: 5e1dad90-57ef-451f-840e-84abc033f452
+		summarizeBy: none
+		sourceColumn: recipient_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_id
+		dataType: string
+		lineageTag: 53bb6e73-c96f-4d81-bd20-3c6e714b0d3c
+		summarizeBy: none
+		sourceColumn: merchant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column agent_id
+		dataType: string
+		lineageTag: 5a8d84f8-c914-4d82-9a6f-46b93a73b169
+		summarizeBy: none
+		sourceColumn: agent_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'reporting fact_reversal' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_fact_reversal = Source{[Schema="reporting",Item="fact_reversal"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(reporting_fact_reversal,{{"occurred_at", type datetimezone}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,41 @@
+table dim_merchant
+	lineageTag: 9e22a7d2-183c-4b6f-949b-0b5bdb9b24ba
+
+	column merchant_id
+		dataType: string
+		lineageTag: fc3f2006-4d27-4a61-8a0b-7764c4177b9d
+		summarizeBy: none
+		sourceColumn: merchant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column opened_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c5f7d37a-c618-4d7b-aa1f-3923115832da
+		summarizeBy: none
+		sourceColumn: opened_date
+
+		variation Variation
+			isDefault
+			relationship: 309a6e3a-d713-4864-82a5-bf66213e127c
+			defaultHierarchy: LocalDateTable_cda5f23e-af91-49df-9502-25ef9b3e00ab.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition 'reporting dim_merchant' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_dim_merchant = Source{[Schema="reporting",Item="dim_merchant"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(reporting_dim_merchant,{{"opened_date", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

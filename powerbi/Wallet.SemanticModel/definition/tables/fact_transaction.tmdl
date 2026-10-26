@@ -1,0 +1,286 @@
+table fact_transaction
+	lineageTag: 9f1ed061-ccb0-48ed-b230-1ae7462d401b
+
+	/// Synthetic portfolio simulation. Count successful original attempts, including originals later reversed. Transfers count once.
+	measure 'Successful Transactions' = CALCULATE(COUNTROWS('fact_transaction'), 'fact_transaction'[status] = "successful")
+		formatString: #,0
+		lineageTag: 66d1261d-d417-4171-9443-87966734b184
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Transaction Attempts' = COUNTROWS('fact_transaction')
+		formatString: #,0
+		displayFolder: Executive overview
+		lineageTag: a590b3c3-0645-49fb-9720-1c601062ca8d
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Failed Transactions' = CALCULATE(COUNTROWS('fact_transaction'), 'fact_transaction'[status] = "failed")
+		formatString: #,0
+		displayFolder: Executive overview
+		lineageTag: cf795f84-73aa-4b49-8b0b-4d1ec0890993
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Failure Rate' = DIVIDE([Failed Transactions], [Transaction Attempts])
+		formatString: 0.00%
+		displayFolder: Executive overview
+		lineageTag: 4583b70e-ba23-4858-a42e-c20d3f34b69d
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Successful Value AED' = DIVIDE(SUM('fact_transaction'[successful_value_minor]), 100)
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: cb61d955-2f22-47f4-bdd0-4d68733d84f5
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Gross Fee Revenue AED' = DIVIDE(SUM('fact_transaction'[fee_minor]), 100)
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: 2426b085-f7a7-4362-ace3-21b637e069fa
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Net Value AED' = [Successful Value AED] - [Reversed Value AED]
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: 749a7140-9184-451d-8218-e95d632c16e2
+
+	/// Synthetic portfolio simulation only. AED monetary values are converted from integer fils. Fees are not profit.
+	measure 'Net Fee Revenue AED' = [Gross Fee Revenue AED] - [Fee Refunds AED]
+		formatString: #,0.00
+		displayFolder: Executive overview
+		lineageTag: aecd562a-3715-423a-93db-6f3151b6c747
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Pending Transactions' = CALCULATE(COUNTROWS('fact_transaction'), 'fact_transaction'[status] = "pending")
+		formatString: #,0
+		displayFolder: Operations
+		lineageTag: 58597d3b-00c0-4c11-9670-203b4bbee3d3
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Pending Rate' = DIVIDE([Pending Transactions], [Transaction Attempts])
+		formatString: 0.00%
+		displayFolder: Operations
+		lineageTag: e4ed0b75-3fcf-45a1-a948-029b0ab40683
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Active Customers' =
+			VAR Successful = FILTER('fact_transaction', 'fact_transaction'[status] = "successful")
+			VAR Participants = DISTINCT(UNION(
+			    SELECTCOLUMNS(Successful, "Customer", 'fact_transaction'[sender_id]),
+			    SELECTCOLUMNS(Successful, "Customer", 'fact_transaction'[recipient_id])))
+			RETURN COALESCE(COUNTROWS(FILTER(Participants, NOT ISBLANK([Customer]) && [Customer] <> "")), 0)
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 5644feb9-aa0e-4b10-a26e-4e83fc0aff80
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Retained Next Month' =
+			VAR BaseMonth = SELECTEDVALUE('dim_date'[month_start])
+			VAR FollowingMonth = EDATE(BaseMonth, 1)
+			VAR LastObserved = CALCULATE(MAX('dim_date'[date]), REMOVEFILTERS('dim_date'), 'dim_date'[is_in_reporting_window] = TRUE())
+			VAR CurrentTx = FILTER('fact_transaction', 'fact_transaction'[status] = "successful")
+			VAR NextTx = CALCULATETABLE(FILTER('fact_transaction', 'fact_transaction'[status] = "successful"),
+			    REMOVEFILTERS('dim_date'), 'dim_date'[date] >= FollowingMonth, 'dim_date'[date] < EDATE(FollowingMonth, 1))
+			VAR CurrentCustomers = FILTER(DISTINCT(UNION(
+			    SELECTCOLUMNS(CurrentTx, "Customer", 'fact_transaction'[sender_id]),
+			    SELECTCOLUMNS(CurrentTx, "Customer", 'fact_transaction'[recipient_id]))), NOT ISBLANK([Customer]) && [Customer] <> "")
+			VAR NextCustomers = FILTER(DISTINCT(UNION(
+			    SELECTCOLUMNS(NextTx, "Customer", 'fact_transaction'[sender_id]),
+			    SELECTCOLUMNS(NextTx, "Customer", 'fact_transaction'[recipient_id]))), NOT ISBLANK([Customer]) && [Customer] <> "")
+			RETURN IF(NOT ISBLANK(BaseMonth) && EOMONTH(FollowingMonth, 0) <= LastObserved,
+			    COALESCE(COUNTROWS(INTERSECT(CurrentCustomers, NextCustomers)), 0))
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 0fb10b91-6012-409f-ace7-7582fe763261
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Next Month Retention' = DIVIDE([Retained Next Month], [Active Customers])
+		formatString: 0.00%
+		displayFolder: Customers
+		lineageTag: 12aadf58-3407-4d55-bb9a-e4bc87186aef
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Not Active Next Month' = IF(NOT ISBLANK([Retained Next Month]), [Active Customers] - [Retained Next Month])
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 583b4a9c-066e-48ec-8cb1-9b81e542c35a
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Average Monthly Active Customers' = AVERAGEX(CALCULATETABLE(VALUES('dim_date'[month_start]), 'dim_date'[is_in_reporting_window] = TRUE()), [Active Customers])
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: f2fc01e9-ffb2-4441-9741-89ea25682c8a
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Latest Month Active Customers' = VAR LatestMonth = CALCULATE(MAX('dim_date'[month_start]), 'dim_date'[is_in_reporting_window] = TRUE()) RETURN CALCULATE([Active Customers], REMOVEFILTERS('dim_date'), 'dim_date'[month_start] = LatestMonth)
+		formatString: #,0
+		displayFolder: Customers
+		lineageTag: 54e55c5c-71a9-4c61-a78d-de5e8d8f128d
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Latest Observable Retention' =
+			VAR LastObserved = CALCULATE(MAX('dim_date'[date]), REMOVEFILTERS('dim_date'), 'dim_date'[is_in_reporting_window] = TRUE())
+			VAR Eligible = FILTER(VALUES('dim_date'[month_start]), EOMONTH('dim_date'[month_start], 1) <= LastObserved && 'dim_date'[month_start] >= CALCULATE(MIN('dim_date'[date]), REMOVEFILTERS('dim_date'), 'dim_date'[is_in_reporting_window] = TRUE()))
+			VAR BaseMonth = MAXX(Eligible, 'dim_date'[month_start])
+			RETURN IF(NOT ISBLANK(BaseMonth), CALCULATE([Next Month Retention], REMOVEFILTERS('dim_date'), 'dim_date'[month_start] = BaseMonth))
+		formatString: 0.00%
+		displayFolder: Customers
+		lineageTag: 47d6a6dc-280b-4308-802e-904b6bbfe03e
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Active Merchants' = CALCULATE(DISTINCTCOUNT('fact_transaction'[merchant_id]), 'fact_transaction'[status] = "successful", 'fact_transaction'[type] = "merchant_payment")
+		formatString: #,0
+		displayFolder: Partners
+		lineageTag: 88291867-b215-49bf-aaa9-8d3eddea3a98
+
+	/// Synthetic data. Customer activity includes successful senders and recipients; reversal alone does not establish activity. Retention requires an observed following month.
+	measure 'Active Agents' = CALCULATE(DISTINCTCOUNT('fact_transaction'[agent_id]), 'fact_transaction'[status] = "successful", 'fact_transaction'[type] IN {"cash_in", "cash_out"})
+		formatString: #,0
+		displayFolder: Partners
+		lineageTag: cc31c4ef-88ff-49b3-9564-aa6f4ca1d9f1
+
+	/// Synthetic data. Net merchant payment value, after reversals by reversal date.
+	measure 'Merchant Net Value AED' = CALCULATE([Net Value AED], dim_service[service_type] = "merchant_payment")
+		formatString: #,0.00
+		displayFolder: Partners
+		lineageTag: 5c8a6434-a49f-4f48-815b-c72057813dd7
+
+	/// Synthetic data. Combined net agent activity volume; not cash balance or agent earnings.
+	measure 'Agent Net Value AED' = CALCULATE([Net Value AED], dim_service[service_type] IN {"cash_in", "cash_out"})
+		formatString: #,0.00
+		displayFolder: Partners
+		lineageTag: a8eb94ba-ba3e-457e-bc4a-f6ec1e7b8efc
+
+	column id
+		dataType: string
+		lineageTag: 1cbc3ed0-c91b-4497-920e-001412d6efb4
+		summarizeBy: none
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column occurred_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 85f8b1c3-83cb-4e29-9840-7a35c5789c96
+		summarizeBy: none
+		sourceColumn: occurred_at
+
+		variation Variation
+			isDefault
+			relationship: 77d34d5e-cf64-44ca-92a6-310c3ac68d34
+			defaultHierarchy: LocalDateTable_bd0d44cf-fd96-4fe7-ada1-993e8a61580c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column type
+		dataType: string
+		lineageTag: bdd12c79-282b-4028-bea8-15658d38692c
+		summarizeBy: none
+		sourceColumn: type
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: 2b42655a-4d30-42ab-999b-68fdc0a95e91
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column currency
+		dataType: string
+		lineageTag: a6ec37c1-ef44-4fd7-95e5-64510938f190
+		summarizeBy: none
+		sourceColumn: currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount_minor
+		dataType: int64
+		formatString: 0
+		lineageTag: c96130d3-fc88-47a1-a905-df9ffa8f0333
+		summarizeBy: sum
+		sourceColumn: amount_minor
+
+		annotation SummarizationSetBy = Automatic
+
+	column fee_minor
+		dataType: int64
+		formatString: 0
+		lineageTag: 37122e3f-cfb9-48a2-bf1c-309e692313e0
+		summarizeBy: sum
+		sourceColumn: fee_minor
+
+		annotation SummarizationSetBy = Automatic
+
+	column sender_id
+		dataType: string
+		lineageTag: 9b6b13f4-8865-4193-b78d-684c90f6ee95
+		summarizeBy: none
+		sourceColumn: sender_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column recipient_id
+		dataType: string
+		lineageTag: c892e115-e05e-496d-bb67-7898bf15a0f6
+		summarizeBy: none
+		sourceColumn: recipient_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_id
+		dataType: string
+		lineageTag: 4080b9b0-8e1d-43b2-801c-16c92f70bc5d
+		summarizeBy: none
+		sourceColumn: merchant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column agent_id
+		dataType: string
+		lineageTag: dd4844a4-63e9-4f9e-8bd9-840756ec95cd
+		summarizeBy: none
+		sourceColumn: agent_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 95b52a01-2ef6-4a06-95d8-68ef9ec57f7e
+		summarizeBy: none
+		sourceColumn: event_date
+
+		variation Variation
+			isDefault
+			relationship: 734b8a0f-ad5f-4505-a597-3296bba3d856
+			defaultHierarchy: LocalDateTable_e159921f-7021-4a68-9ca0-59ae2bd7f033.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column successful_value_minor
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b38506e-290a-46ad-a8cd-708a6fad4dc3
+		summarizeBy: sum
+		sourceColumn: successful_value_minor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'reporting fact_transaction' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "digital_wallet_b"),
+				    reporting_fact_transaction = Source{[Schema="reporting",Item="fact_transaction"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(reporting_fact_transaction,{{"occurred_at", type datetimezone}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

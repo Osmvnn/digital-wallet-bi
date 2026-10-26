@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "groups_checked": 48,
+  "metrics_per_group": 9,
+  "comparisons": 432,
+  "totals": {
+    "attempts": 10000,
+    "successes": 9185,
+    "failures": 608,
+    "pending": 207,
+    "gross_value_minor": 921559899,
+    "gross_fees_minor": 4037632,
+    "reversals": 232,
+    "reversed_value_minor": 23345140,
+    "fee_refunds_minor": 106576
+  },
+  "label": "Synthetic data",
+  "reference": "Generated CSVs",
+  "powerbi_export": "docs/validation/powerbi_month_service.csv"
+}

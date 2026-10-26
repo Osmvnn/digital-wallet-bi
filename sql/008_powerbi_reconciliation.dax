@@ -1,0 +1,16 @@
+EVALUATE
+SELECTCOLUMNS(
+    SUMMARIZECOLUMNS('dim_date'[year_month], 'dim_service'[service_type],
+        FILTER(ALL('dim_date'), 'dim_date'[is_in_reporting_window] = TRUE()),
+        "Attempts", [Transaction Attempts], "Successes", [Successful Transactions],
+        "Failures", [Failed Transactions], "Pending", [Pending Transactions],
+        "GrossValueMinor", SUM('fact_transaction'[successful_value_minor]),
+        "GrossFeesMinor", SUM('fact_transaction'[fee_minor]),
+        "Reversals", COALESCE([Reversal Count], 0),
+        "ReversedValueMinor", COALESCE(SUM('fact_reversal'[amount_minor]),0),
+        "FeeRefundsMinor", COALESCE(SUM('fact_reversal'[fee_refund_minor]),0)),
+    "month", 'dim_date'[year_month], "service", 'dim_service'[service_type],
+    "attempts", [Attempts], "successes", [Successes], "failures", [Failures], "pending", [Pending],
+    "gross_value_minor", [GrossValueMinor], "gross_fees_minor", [GrossFeesMinor],
+    "reversals", [Reversals], "reversed_value_minor", [ReversedValueMinor], "fee_refunds_minor", [FeeRefundsMinor])
+ORDER BY [month], [service]

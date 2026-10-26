@@ -1,0 +1,26 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/
+**/.pbi/
+**/backups/
+
+# Superseded development projects and snapshots; final project is powerbi/Wallet.pbip.
+/Wallet.Report/
+/Wallet.SemanticModel/
+/Wallet.pbip
+/WalletProfessional/
+/powerbi/before_model_setup/
+/powerbi/model_after_setup/
+/powerbi/powerbi/
+
+# Superseded milestone notes; use README.md and docs/verification.md.
+/docs/milestone_1_results.md
+/docs/milestone_2_loading.md
+/docs/power_bi_first_import.md
+/docs/power_bi_model_setup_results.md
+*.log
+*.tmp
+*.pbix
+*.pbit

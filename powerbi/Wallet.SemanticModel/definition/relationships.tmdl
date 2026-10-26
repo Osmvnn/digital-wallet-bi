@@ -1,0 +1,72 @@
+relationship 309a6e3a-d713-4864-82a5-bf66213e127c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_merchant.opened_date
+	toColumn: LocalDateTable_cda5f23e-af91-49df-9502-25ef9b3e00ab.Date
+
+relationship 47cf861a-2e8a-4bf9-b2bd-eb1957237222
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_date.date
+	toColumn: LocalDateTable_1c2e2341-6723-4bc5-8e38-a2b765b62034.Date
+
+relationship 217333e1-5e40-441f-9bf5-0e4286eafc2f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_date.month_start
+	toColumn: LocalDateTable_d71ed2db-7cc0-49a3-9c3b-c2db1a2ef1dc.Date
+
+relationship 9ae312b6-1ca7-4941-a75f-8271e6fed22c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: dim_agent.opened_date
+	toColumn: LocalDateTable_d7f7be71-614e-49bb-aba4-d23bef62b1f2.Date
+
+relationship 77d34d5e-cf64-44ca-92a6-310c3ac68d34
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_transaction.occurred_at
+	toColumn: LocalDateTable_bd0d44cf-fd96-4fe7-ada1-993e8a61580c.Date
+
+relationship 734b8a0f-ad5f-4505-a597-3296bba3d856
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_transaction.event_date
+	toColumn: LocalDateTable_e159921f-7021-4a68-9ca0-59ae2bd7f033.Date
+
+relationship d8fd9974-455c-48b7-8127-f2eefd1658d6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_reversal.occurred_at
+	toColumn: LocalDateTable_abb7a525-f030-4daa-b327-8837c5f476c9.Date
+
+relationship ed8cfc6f-bfe8-492e-8dce-014e588f4147
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fact_reversal.event_date
+	toColumn: LocalDateTable_6f6abb20-a97d-4fd2-b590-91eeca2f7c06.Date
+
+relationship AutoDetected_78608ac7-95b2-4699-a6eb-9175bfe6b657
+	fromColumn: fact_transaction.merchant_id
+	toColumn: dim_merchant.merchant_id
+
+relationship AutoDetected_7666875a-41e3-4f45-acab-d4fca0b27621
+	fromColumn: fact_reversal.merchant_id
+	toColumn: dim_merchant.merchant_id
+
+relationship AutoDetected_a7a79a4f-32a7-42ff-a4c1-f107b6c611b5
+	fromColumn: fact_transaction.agent_id
+	toColumn: dim_agent.agent_id
+
+relationship AutoDetected_ee596db5-0128-41c8-962e-95aa6425a578
+	fromColumn: fact_reversal.agent_id
+	toColumn: dim_agent.agent_id
+
+relationship fact_transaction_date
+	fromColumn: fact_transaction.event_date
+	toColumn: dim_date.date
+
+relationship fact_transaction_service
+	fromColumn: fact_transaction.type
+	toColumn: dim_service.service_type
+
+relationship fact_reversal_date
+	fromColumn: fact_reversal.event_date
+	toColumn: dim_date.date
+
+relationship fact_reversal_service
+	fromColumn: fact_reversal.type
+	toColumn: dim_service.service_type
+
