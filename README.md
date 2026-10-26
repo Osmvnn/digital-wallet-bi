@@ -15,6 +15,26 @@ Open **[powerbi/Wallet.pbip](powerbi/Wallet.pbip)**. This is the single final pr
 
 All pages use synthetic data for October 2025–September 2026, UTC, in AED. Net fees are not profit; costs are not modeled. The model cache is excluded from Git, so reproduce the database and Refresh after cloning.
 
+## Report screenshots
+
+All screenshots show synthetic data.
+
+### Executive overview
+
+![Executive overview showing successful transactions, payment value, net fees and failure rate](powerbi/pic/Screenshot%202026-10-26%20161146.png)
+
+### Transaction operations
+
+![Transaction operations showing failed and pending attempts, reversals and monthly trends](powerbi/pic/Screenshot%202026-10-26%20161221.png)
+
+### Customer activity and retention
+
+![Customer report showing active customers and next-month activity retention](powerbi/pic/Screenshot%202026-10-26%20161251.png)
+
+### Merchant and agent performance
+
+![Partner report showing merchant payments and agent cash-in and cash-out activity](powerbi/pic/Screenshot%202026-10-26%20161318.png)
+
 ## Architecture
 
 ```mermaid
